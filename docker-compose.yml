@@ -1,0 +1,75 @@
+version: '2.2'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.1.3
+    container_name: elasticsearch
+    environment:
+      - cluster.name=my-application
+      - node.master=false
+      - node.data=true
+      - node.ingest=false
+      - node.name=db1
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearchmaster"
+      - xpack.monitoring.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+    networks:
+      - docker0
+  elasticsearch2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.1.3
+    container_name: elasticsearch2
+    environment:
+      - cluster.name=my-application
+      - node.master=false
+      - node.data=true
+      - node.ingest=false
+      - node.name=db2
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearchmaster"
+      - xpack.monitoring.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata2:/usr/share/elasticsearch/data
+    networks:
+      - docker0
+  elasticsearch3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.1.3
+    container_name: elasticsearchmaster
+    environment:
+      - xpack.monitoring.enabled=false
+      - cluster.name=my-application
+      - node.master=true
+      - node.data=false
+      - node.ingest=false
+      - node.name=master
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata3:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - docker0
+volumes:
+  esdata1:
+    driver: local
+  esdata2:
+    driver: local
+  esdata3:
+    driver: local
+networks:
+  docker0:
